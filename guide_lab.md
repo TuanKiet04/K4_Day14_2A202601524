@@ -246,10 +246,10 @@ Hoàn thiện `categorize_failures()`, `find_root_cause()`,
 
 Hai lệnh không thay thế nhau:
 
-| Lệnh | Mục đích | Nó thực sự chạy gì? |
-|---|---|---|
-| `python template.py` | Manual demo để nhìn output | Chạy `mock_agent` trên 5 sample QA rồi in report/failure analysis. Không gọi API, không chạy real RAG và không kiểm tra mọi function — đặc biệt không cover đầy đủ LLMJudge/regression. Demo chỉ chạy hết sau khi Tasks 1, 2, 4 và 5 đã được implement. |
-| `pytest tests/ -v` | Kiểm tra bài làm | Chạy 42 unit tests cho metrics, wiring, judge, runner, regression và failure analyzer. Đây mới là kết quả dùng để xác nhận core đúng. |
+| Lệnh                  | Mục đích                   | Nó thực sự chạy gì?                                                                                                                                                                                                                                                              |
+| ---------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `python template.py` | Manual demo để nhìn output | Chạy`mock_agent` trên 5 sample QA rồi in report/failure analysis. Không gọi API, không chạy real RAG và không kiểm tra mọi function — đặc biệt không cover đầy đủ LLMJudge/regression. Demo chỉ chạy hết sau khi Tasks 1, 2, 4 và 5 đã được implement. |
+| `pytest tests/ -v`   | Kiểm tra bài làm           | Chạy 42 unit tests cho metrics, wiring, judge, runner, regression và failure analyzer. Đây mới là kết quả dùng để xác nhận core đúng.                                                                                                                                  |
 
 `python template.py` chạy thành công **không có nghĩa** 42 tests đã pass. Ngược
 lại, khi mới làm Task 1–3, demo có thể vẫn dừng ở TODO của Runner/Analyzer dù
@@ -259,25 +259,25 @@ phần vừa làm đã đúng; lúc đó dùng targeted tests dưới đây.
 
 Làm theo đúng thứ tự và chạy test ngay sau mỗi nhóm:
 
-| Checkpoint | Lệnh targeted | Kết quả targeted mong đợi |
-|---|---|---:|
-| Task 1 — Data models + `overall_score` | `pytest tests/test_solution.py::TestEvalResultOverallScore -v` | 3 passed |
-| Task 2 — 5 metrics + `run_full_eval` | `pytest tests/test_solution.py::TestRAGASEvaluator tests/test_solution.py::TestContextMetrics tests/test_solution.py::TestRetrievalMetricWiring::test_run_full_eval_connects_optional_retrieval_metrics -v` | 14 passed, 1 skipped |
-| Task 3 — LLMJudge | `pytest tests/test_solution.py::TestLLMJudge -v` | 4 passed |
-| Task 4 — Runner + report + regression | `pytest tests/test_solution.py::TestBenchmarkRunner tests/test_solution.py::TestRunRegression tests/test_solution.py::TestRetrievalMetricWiring::test_runner_forwards_retrieved_contexts tests/test_solution.py::TestRetrievalMetricWiring::test_report_includes_retrieval_averages -v` | 11 passed |
-| Task 5 — FailureAnalyzer | `pytest tests/test_solution.py::TestFailureAnalyzer tests/test_solution.py::TestGenerateImprovementLog -v` | 9 passed |
+| Checkpoint                               | Lệnh targeted                                                                                                                                                                                                                                                                            | Kết quả targeted mong đợi |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------: |
+| Task 1 — Data models +`overall_score` | `pytest tests/test_solution.py::TestEvalResultOverallScore -v`                                                                                                                                                                                                                          |                      3 passed |
+| Task 2 — 5 metrics +`run_full_eval`   | `pytest tests/test_solution.py::TestRAGASEvaluator tests/test_solution.py::TestContextMetrics tests/test_solution.py::TestRetrievalMetricWiring::test_run_full_eval_connects_optional_retrieval_metrics -v`                                                                             |          14 passed, 1 skipped |
+| Task 3 — LLMJudge                       | `pytest tests/test_solution.py::TestLLMJudge -v`                                                                                                                                                                                                                                        |                      4 passed |
+| Task 4 — Runner + report + regression   | `pytest tests/test_solution.py::TestBenchmarkRunner tests/test_solution.py::TestRunRegression tests/test_solution.py::TestRetrievalMetricWiring::test_runner_forwards_retrieved_contexts tests/test_solution.py::TestRetrievalMetricWiring::test_report_includes_retrieval_averages -v` |                     11 passed |
+| Task 5 — FailureAnalyzer                | `pytest tests/test_solution.py::TestFailureAnalyzer tests/test_solution.py::TestGenerateImprovementLog -v`                                                                                                                                                                              |                      9 passed |
 
 Nếu cũng chạy toàn bộ suite sau mỗi checkpoint, số cộng dồn trên starter chuẩn là:
 
-| Trạng thái | Full-suite result |
-|---|---:|
-| Chưa làm TODO | 0 passed, 42 failed |
-| Xong Task 1 | 3 passed, 39 failed |
-| Xong Task 2 | 17 passed, 24 failed, 1 skipped |
-| Xong Task 3 | 21 passed, 20 failed, 1 skipped |
-| Xong Task 4 | 32 passed, 9 failed, 1 skipped |
-| Xong Task 5 — hoàn thành phần bắt buộc | 41 passed, 1 skipped |
-| Làm thêm `rerank_by_overlap()` bonus | 42 passed |
+| Trạng thái                                 |               Full-suite result |
+| -------------------------------------------- | ------------------------------: |
+| Chưa làm TODO                              |             0 passed, 42 failed |
+| Xong Task 1                                  |             3 passed, 39 failed |
+| Xong Task 2                                  | 17 passed, 24 failed, 1 skipped |
+| Xong Task 3                                  | 21 passed, 20 failed, 1 skipped |
+| Xong Task 4                                  |  32 passed, 9 failed, 1 skipped |
+| Xong Task 5 — hoàn thành phần bắt buộc |            41 passed, 1 skipped |
+| Làm thêm`rerank_by_overlap()` bonus      |                       42 passed |
 
 Test bonus reranking được skip nếu Exercise 3.5 chưa làm. Nếu bạn làm bonus sớm,
 con số `skipped` trong bảng sẽ chuyển thành `passed`. Tên test fail quan trọng
@@ -285,18 +285,18 @@ hơn việc cố ép đúng con số. Không sửa tests để làm bài pass.
 
 **Test ownership theo function**
 
-| Function/nhóm function | Số public tests trực tiếp |
-|---|---:|
-| `overall_score()` | 3 |
-| Faithfulness / Relevance / Completeness | 3 / 2 / 2 |
-| Context Recall / Context Precision | 3 / 3 |
-| Retrieval connection trong `run_full_eval()` | 1 |
-| `rerank_by_overlap()` | 1 bonus |
-| `score_response()` / `detect_bias()` | 3 / 1 |
-| `BenchmarkRunner.run()` / `generate_report()` | 3 / 3 |
-| `identify_failures()` / `run_regression()` | 2 / 3 |
-| Failure categories + suggestions | 2 + 3 |
-| Improvement log | 4 |
+| Function/nhóm function                           | Số public tests trực tiếp |
+| ------------------------------------------------- | ---------------------------: |
+| `overall_score()`                               |                            3 |
+| Faithfulness / Relevance / Completeness           |                    3 / 2 / 2 |
+| Context Recall / Context Precision                |                        3 / 3 |
+| Retrieval connection trong`run_full_eval()`     |                            1 |
+| `rerank_by_overlap()`                           |                      1 bonus |
+| `score_response()` / `detect_bias()`          |                        3 / 1 |
+| `BenchmarkRunner.run()` / `generate_report()` |                        3 / 3 |
+| `identify_failures()` / `run_regression()`    |                        2 / 3 |
+| Failure categories + suggestions                  |                        2 + 3 |
+| Improvement log                                   |                            4 |
 
 Data-model fields và `find_root_cause()` còn được kiểm tra gián tiếp qua các
 nhóm trên, nên đừng bỏ qua chỉ vì không có một test class riêng.
@@ -320,18 +320,18 @@ data/technology_store/
 file Markdown. Corpus synthetic này là source of truth duy nhất của lab, kể cả
 khi chính sách khác với kiến thức thực tế.
 
-| Document | Nội dung chính |
-|---|---|
-| `00_system_scope.md` | Scope, safety, privacy, out-of-scope |
-| `01_product_catalog.md` | Products, specifications, compatibility |
-| `02_orders_and_payments.md` | Orders, payments, cancellations, installments |
-| `03_promotions_and_membership.md` | Promotions, membership, bundles |
-| `04_shipping_and_delivery.md` | Shipping, delays, missing packages |
-| `05_returns_and_exchanges.md` | Returns, exchanges, refunds, restocking |
-| `06_warranty_policy.md` | Warranty coverage, exclusions, proof of purchase |
-| `07_repair_and_technical_support.md` | Troubleshooting, repair, service time, data backup |
-| `08_accounts_privacy_and_security.md` | Accounts, privacy, security, fraud |
-| `09_escalation_and_policy_updates.md` | Escalation, complaints, policy versions |
+| Document                                | Nội dung chính                                   |
+| --------------------------------------- | -------------------------------------------------- |
+| `00_system_scope.md`                  | Scope, safety, privacy, out-of-scope               |
+| `01_product_catalog.md`               | Products, specifications, compatibility            |
+| `02_orders_and_payments.md`           | Orders, payments, cancellations, installments      |
+| `03_promotions_and_membership.md`     | Promotions, membership, bundles                    |
+| `04_shipping_and_delivery.md`         | Shipping, delays, missing packages                 |
+| `05_returns_and_exchanges.md`         | Returns, exchanges, refunds, restocking            |
+| `06_warranty_policy.md`               | Warranty coverage, exclusions, proof of purchase   |
+| `07_repair_and_technical_support.md`  | Troubleshooting, repair, service time, data backup |
+| `08_accounts_privacy_and_security.md` | Accounts, privacy, security, fraud                 |
+| `09_escalation_and_policy_updates.md` | Escalation, complaints, policy versions            |
 
 Không sửa corpus để làm cho expected answer khớp với suy đoán cá nhân. Nếu
 expected answer không được corpus hỗ trợ, sửa golden dataset.
@@ -374,16 +374,16 @@ objects theo evidence thực tế; file hoàn thành không được còn contex
 
 ### 5.3 Ý nghĩa từng field
 
-| Field | Cách điền |
-|---|---|
-| `id` | Đã khóa theo vị trí, không sửa |
-| `difficulty` | Đã khóa, không sửa |
-| `question` | Câu hỏi do bạn thiết kế |
-| `expected_answer` | Expert-written reference answer |
-| `contexts` | Evidence hỗ trợ toàn bộ expected answer |
-| `source_doc` | Tên chính xác của Markdown source |
-| `text` | Đoạn trích nguyên văn từ source |
-| `attack_type` | `null` với E/M/H; đã khóa với A01–A03 |
+| Field               | Cách điền                                  |
+| ------------------- | --------------------------------------------- |
+| `id`              | Đã khóa theo vị trí, không sửa         |
+| `difficulty`      | Đã khóa, không sửa                       |
+| `question`        | Câu hỏi do bạn thiết kế                  |
+| `expected_answer` | Expert-written reference answer               |
+| `contexts`        | Evidence hỗ trợ toàn bộ expected answer   |
+| `source_doc`      | Tên chính xác của Markdown source         |
+| `text`            | Đoạn trích nguyên văn từ source         |
+| `attack_type`     | `null` với E/M/H; đã khóa với A01–A03 |
 
 `text` phải là substring nguyên văn của source document. Không paste cả
 document; lấy đoạn ngắn đủ bảo vệ expected answer.
@@ -478,11 +478,11 @@ Toy example:
 
 Ba slots đã khóa:
 
-| ID | Attack type | Mục tiêu |
-|---|---|---|
-| A01 | `out_of_scope` | Assistant phải từ chối/giới hạn đúng scope |
-| A02 | `prompt_injection` | Không làm theo instruction phá system rules |
-| A03 | `false_premise_or_ambiguous_trap` | Không xác nhận premise sai hoặc đoán bừa |
+| ID  | Attack type                         | Mục tiêu                                        |
+| --- | ----------------------------------- | ------------------------------------------------- |
+| A01 | `out_of_scope`                    | Assistant phải từ chối/giới hạn đúng scope |
+| A02 | `prompt_injection`                | Không làm theo instruction phá system rules    |
+| A03 | `false_premise_or_ambiguous_trap` | Không xác nhận premise sai hoặc đoán bừa   |
 
 Các record này đã gợi ý `00_system_scope.md`. Bạn phải copy evidence phù hợp
 vào `text` và viết expected answer đúng với policy. Một adversarial case tốt
@@ -795,19 +795,19 @@ Trước khi sửa code, kiểm tra terminal đang ở repo root (`pwd` trên ma
 `Get-Location` trên PowerShell) và chạy `python --version` để xác nhận virtual
 environment đã được activate.
 
-| Triệu chứng | Nguyên nhân thường gặp | Cách xử lý |
-|---|---|---|
-| Không nhận lệnh `python`, `python3` hoặc `py` | Python chưa được cài hoặc launcher chưa nằm trong `PATH` | Cài Python 3.11+ rồi dùng lệnh tương ứng với hệ điều hành ở Mục 2 |
-| `ImportError: cannot import name UTC from datetime` | Venv được tạo bằng Python 3.9/3.10 | Xóa/tạo lại venv bằng Python 3.11+; kiểm tra version trước khi cài requirements |
-| `ModuleNotFoundError: openai` hoặc `dotenv` | Chưa activate venv hoặc chưa cài requirements | Activate `.venv`, rồi chạy `python -m pip install -r requirements.txt` |
-| Validator liệt kê nhiều field rỗng | `golden_dataset.json` vẫn là form starter | Điền đủ 20 records; đây là lỗi mong đợi trước Exercise 3.1 |
-| `text is not a verbatim substring` | Evidence đã bị sửa wording/punctuation | Copy lại nguyên văn đoạn ngắn từ đúng `source_doc` |
-| `OPENAI_API_KEY is missing from .env` | Thiếu `.env`, key còn placeholder, hoặc chạy sai directory | Copy `.env.example` thành `.env`, điền key thật và chạy từ repo root |
-| `Dataset corpus_id ... does not match assistant corpus_id` | Đã sửa nhầm `corpus_id` | Khôi phục `orbittech-customer-support-v1` |
-| `question differs between artifacts` | Golden dataset đã đổi sau lần sinh answers | Validate rồi chạy lại `python domain_assistant.py` để tạo artifact mới |
-| `Complete the required TODOs in template.py first` | Core còn `NotImplementedError` | Quay lại checkpoint test tương ứng ở Mục 4.9 |
-| Sửa `template.py` nhưng tests vẫn cho kết quả cũ | `solution/solution.py` đã tồn tại và được tests ưu tiên | Copy lại theo lệnh macOS/Linux hoặc Windows ở Mục 13, rồi chạy tests |
-| Context Recall/Precision là `None` | Retrieval trace chưa được truyền vào full evaluator | Kiểm tra `actual_answers.json` có chunks, adapter tạo `QAPair.retrieved_contexts`, và Runner truyền `contexts` |
+| Triệu chứng                                                | Nguyên nhân thường gặp                                         | Cách xử lý                                                                                                            |
+| ------------------------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Không nhận lệnh`python`, `python3` hoặc `py`       | Python chưa được cài hoặc launcher chưa nằm trong`PATH`   | Cài Python 3.11+ rồi dùng lệnh tương ứng với hệ điều hành ở Mục 2                                          |
+| `ImportError: cannot import name UTC from datetime`        | Venv được tạo bằng Python 3.9/3.10                             | Xóa/tạo lại venv bằng Python 3.11+; kiểm tra version trước khi cài requirements                                  |
+| `ModuleNotFoundError: openai` hoặc `dotenv`             | Chưa activate venv hoặc chưa cài requirements                   | Activate`.venv`, rồi chạy `python -m pip install -r requirements.txt`                                              |
+| Validator liệt kê nhiều field rỗng                       | `golden_dataset.json` vẫn là form starter                       | Điền đủ 20 records; đây là lỗi mong đợi trước Exercise 3.1                                                   |
+| `text is not a verbatim substring`                         | Evidence đã bị sửa wording/punctuation                          | Copy lại nguyên văn đoạn ngắn từ đúng`source_doc`                                                             |
+| `OPENAI_API_KEY is missing from .env`                      | Thiếu`.env`, key còn placeholder, hoặc chạy sai directory     | Copy`.env.example` thành `.env`, điền key thật và chạy từ repo root                                           |
+| `Dataset corpus_id ... does not match assistant corpus_id` | Đã sửa nhầm`corpus_id`                                        | Khôi phục`orbittech-customer-support-v1`                                                                             |
+| `question differs between artifacts`                       | Golden dataset đã đổi sau lần sinh answers                     | Validate rồi chạy lại`python domain_assistant.py` để tạo artifact mới                                           |
+| `Complete the required TODOs in template.py first`         | Core còn`NotImplementedError`                                    | Quay lại checkpoint test tương ứng ở Mục 4.9                                                                       |
+| Sửa`template.py` nhưng tests vẫn cho kết quả cũ      | `solution/solution.py` đã tồn tại và được tests ưu tiên | Copy lại theo lệnh macOS/Linux hoặc Windows ở Mục 13, rồi chạy tests                                              |
+| Context Recall/Precision là`None`                         | Retrieval trace chưa được truyền vào full evaluator           | Kiểm tra`actual_answers.json` có chunks, adapter tạo `QAPair.retrieved_contexts`, và Runner truyền `contexts` |
 
 Nếu lỗi không nằm trong bảng, đọc **test name hoặc dòng `ERROR:` đầu tiên** trước;
 đừng chỉ nhìn dòng tổng kết cuối terminal. Chạy lại đúng một targeted test bằng
